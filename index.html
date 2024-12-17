@@ -16,6 +16,22 @@
         min-width: 60%;
         z-index: 99999999 !important;
 
+        &.bottom {
+          top: unset;
+          bottom: 0;
+        }
+        #flex {
+          display: flex;
+          align-items: center;
+          .ml-2 {
+            margin-left: 10px;
+          }
+        }
+        #checkbox_ {
+          color: #fff;
+          display: flex;
+          justify-content: space-between;
+        }
         #url {
           width: 100%;
         }
@@ -24,27 +40,102 @@
   </head>
   <body>
     <div id="form">
-      <textarea type="text" id="url" placeholder="Enter URL"></textarea>
+      <input
+        list="suggestions"
+        name="suggestions"
+        type="text"
+        id="url"
+        placeholder="Enter URL"
+      />
+      <datalist id="suggestions">
+        <option value="https://www.example.com"></option>
+        <option value="https://www.google.com"></option>
+        <option value="https://www.github.com"></option>
+        <option value="https://www.stackoverflow.com"></option>
+        <option value="https://www.wikipedia.org"></option>
+      </datalist>
+
       <br />
-      <button id="fetchButton">Fetch Page</button>
+      <div id="checkbox_" class="flex">
+        <div id="flex">
+          <p>Load</p>
+          <div class="ml-2">
+            <label for="script">Script</label>
+            <input type="checkbox" name="script" id="script" />
+          </div>
+          <div class="ml-2">
+            <label for="images">Images</label>
+            <input type="checkbox" name="images" id="images" />
+          </div>
+        </div>
+        <div>
+          <button id="togglePos">Position</button>
+          <button id="fetchButton">Fetch Page</button>
+        </div>
+      </div>
     </div>
     <div id="result"></div>
     <script>
+      const browserForm = document.getElementById("form");
+      document.getElementById("togglePos").addEventListener("click", () => {
+        browserForm.classList.toggle("bottom");
+      });
+
+      function loadURL_History() {
+        const parseHistory = localStorage.getItem("browser_spa");
+        if (!parseHistory) return;
+        const history = JSON.parse(parseHistory);
+        const uniqueArray = [...new Set(history)];
+        localStorage.setItem("browser_spa", JSON.stringify(uniqueArray));
+        const list = document.getElementById("suggestions");
+        if (uniqueArray) {
+          uniqueArray.forEach((link) => {
+            const option = document.createElement("option");
+            option.value = link;
+            option.textContent = link;
+            list.append(option);
+          });
+        }
+      }
+
+      function historyUpdater(newLink) {
+        const parseHistory = localStorage.getItem("browser_spa");
+        const history = parseHistory ? JSON.parse(parseHistory) : [];
+        localStorage.setItem(
+          "browser_spa",
+          JSON.stringify([newLink, ...history])
+        );
+      }
+
       document
         .getElementById("fetchButton")
         .addEventListener("click", async () => {
           const url = document.getElementById("url").value;
+          const isScript = document.getElementById("script").checked;
+          const isImages = document.getElementById("images").checked;
+
           const response = await fetch("http://localhost:3000/fetch-page", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ url }),
+            body: JSON.stringify({ url, isScript, isImages }),
           });
 
           if (response.ok) {
             const text = await response.text();
             document.getElementById("result").innerHTML = text;
+
+            const tempDiv = document.createElement("div");
+            tempDiv.innerHTML = text;
+
+            const title = tempDiv.querySelector("title")
+              ? tempDiv.querySelector("title").innerText
+              : "No Title Found";
+            document.title = title; // Set the document title
+
+            historyUpdater(url);
+            loadURL_History();
           } else {
             document.getElementById("result").innerHTML =
               "Error fetching the page";
