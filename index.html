@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fetch Page</title>
+    <style>
+      #form {
+        position: fixed;
+        top: 0%;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #434343;
+        padding: 20px;
+        padding-top: 10px;
+        min-width: 60%;
+        z-index: 99999999 !important;
+
+        #url {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="form">
+      <textarea type="text" id="url" placeholder="Enter URL"></textarea>
+      <br />
+      <button id="fetchButton">Fetch Page</button>
+    </div>
+    <div id="result"></div>
+    <script>
+      document
+        .getElementById("fetchButton")
+        .addEventListener("click", async () => {
+          const url = document.getElementById("url").value;
+          const response = await fetch("http://localhost:3000/fetch-page", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ url }),
+          });
+
+          if (response.ok) {
+            const text = await response.text();
+            document.getElementById("result").innerHTML = text;
+          } else {
+            document.getElementById("result").innerHTML =
+              "Error fetching the page";
+          }
+        });
+    </script>
+  </body>
+</html>
