@@ -53,6 +53,14 @@ app.post("/fetch-page", async (req, res) => {
   }
 });
 
+app.get("/*", (req, res) => {
+  res.send("Invalid URL");
+});
+
+app.post("/*", (req, res) => {
+  res.send("Invalid URL");
+});
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
