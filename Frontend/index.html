@@ -114,13 +114,16 @@
           const isScript = document.getElementById("script").checked;
           const isImages = document.getElementById("images").checked;
 
-          const response = await fetch("https://browsing-spa.onrender.com/", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ url, isScript, isImages }),
-          });
+          const response = await fetch(
+            "https://browsing-spa.onrender.com/fetch-page",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ url, isScript, isImages }),
+            }
+          );
 
           if (response.ok) {
             const text = await response.text();
