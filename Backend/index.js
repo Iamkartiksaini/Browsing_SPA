@@ -10,6 +10,10 @@ app.use(cors());
 app.use(express.json());
 // app.use(express.static("frontend"));
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Browsing SPA Backend!");
+});
+
 app.post("/fetch-page", async (req, res) => {
   const { url, isScript, isImages } = req.body;
   // Validate the URL
